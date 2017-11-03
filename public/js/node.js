@@ -1,8 +1,12 @@
 Ambra_3_node.define("node", function(ctx) {
   var
+    utils = ctx.require("utils"),
+    names = ctx.require("names"),
     inst = {
-      "create": function(name, parents, children) {
+      "create": function(gender, name, parents, children) {
         var
+          gender = gender || utils.choose(names.genders),
+          name = name || names.create(gender),
           parents = parents || [],
           children = children || [],
           node = {

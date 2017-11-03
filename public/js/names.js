@@ -37,18 +37,23 @@ Ambra_3_node.define("names", function(ctx) {
       }
     },
     inst = {
+      "genders": genders,
       "create": function(gender) {
         var
           type = getType(gender),
           first = choose(names[type]),
           last = choose(names["last"]),
-          initial = choose(names["initials"]);
-        return {
-          "first": first,
-          "initial": initial,
-          "last": last,
-          "name": [first, initial + ".", last].join(" ")
-        };
+          initial = choose(names["initials"]),
+          name = {
+            "gender": gender,
+            "first": first,
+            "initial": initial,
+            "last": last,
+            "getName": function() {
+              return [name.first, name.initial + ".", name.last].join(" ");
+            }
+          };
+        return name;
       }
     };
   return inst;
