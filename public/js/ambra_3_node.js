@@ -1,7 +1,7 @@
 
 var
-	Ambra_3_node = (function() {
-		var 
+  Ambra_3_node = (function() {
+    var 
       loadingEl,
       contentEl,
       modules = {},
@@ -26,100 +26,79 @@ var
             })
           );
         },
-        "createNodeData": function(params) {
-          var 
+        "getPeople": function(parents, params) {
+          var
             RANDOM_NAME = NO_CHILDREN = null,
             utils = modules["utils"],
             node = modules["node"],
-            levels = params.levels,
-            min = params.min,
-            max = params.max,
-            data = [],
-            level, todo, half, gender, pair,
             
-            grandparents, 
-            parents = [], 
-            kids = [],
-            
-            grandDads, grandMas, grandPairs,
-            dads = [], 
-            moms = [],
-            parentPairs,
-            sons, daughters,
-            offspring,
-            
-            x,y,z,
-            
-            getPeople = function getPeople(parents) {
-              var
-                people = {},
-                boys = people.boys = [],
-                girls = people.girls = [],
-                todo, half,
-                j;
-              
-              todo = utils.rand(min, max);
-              half = Math.floor(todo / 2);
-              
-              for (j=0; j<todo; j++) {
-                if (j < half) {
-                  boys.push(
-                    node.create("male", RANDOM_NAME, parents, NO_CHILDREN)
-                  );
-                } else {
-                  girls.push(
-                    node.create("female", RANDOM_NAME, parents, NO_CHILDREN)
-                  );
-                }
-              }
-              
-              parents.forEach(function(parent) {
-                boys.forEach(function(boy) {
-                  parent.addChild(boy);
-                });
-                girls.forEach(function(girl) {
-                  parent.addChild(girl);
-                });
-              });
+            people = {},
+            boys = people.boys = [],
+            girls = people.girls = [],
+            todo = utils.rand(params.min, params.max), 
+            half = Math.floor(todo / 2),
+            j;
+          
+          for (j=0; j<todo; j++) {
+            if (j < half) {
+              boys.push(
+                node.create("male", RANDOM_NAME, parents, NO_CHILDREN)
+              );
+            } else {
+              girls.push(
+                node.create("female", RANDOM_NAME, parents, NO_CHILDREN)
+              );
+            }
+          }
 
-              return people;
-            };
+          parents.forEach(function(parent) {
+            boys.forEach(function(boy) {
+              parent.addChild(boy);
+            });
+            girls.forEach(function(girl) {
+              parent.addChild(girl);
+            });
+          });
+
+          return people;
+        },
+        "createNodeData": function(params) {
+          var 
+            utils = modules["utils"],
+            pairs = [], 
+            data = [],
+            group, males, females, 
+            pair, maxPairs, parentPairs,
+            x,y;
+
+          group = inst.getPeople([], params);
+          males = group.boys;
+          females = group.girls;
           
-          grandparents = getPeople([]);
-          console.log("grandparents", grandparents);
-          
-          grandDads = grandparents.boys;
-          console.log("grandDads", grandDads);
           // save data:
-          grandDads.forEach(function(male) {
+          males.forEach(function(male) {
             data.push(male);
           });
-          
-          grandMas = grandparents.girls;
-          console.log("grandMas", grandMas);
-          // save data:
-          grandMas.forEach(function(female) {
+          females.forEach(function(female) {
             data.push(female);
           });
           
-          grandPairs = Math.min(grandDads.length, grandMas.length);
-          
-          for (x=0; x<grandPairs; x++) {
+          // breed initial pairs
+          maxPairs = Math.min(males.length, females.length);
+          for (x=0; x<maxPairs; x++) {
             pair = [
-              utils.pick(grandDads),
-              utils.pick(grandMas)
+              utils.pick(males),
+              utils.pick(females)
             ];
-            //console.log(x, grandDads.length, grandMas.length, pair);
-            parents.push(
-              getPeople(pair)
+            pairs.push(
+              inst.getPeople(pair, params)
             );
           }
-          
-          console.log("parents", parents);
-          
-          // don't allow inbreeding:
-          for (x=0; x<grandPairs; x++) {
-            pair = parents[x];
+
+          // don't allow inbreeding of siblings:
+          for (x=0; x<maxPairs; x++) {
+            pair = pairs[x];
+            
             // save data:
             pair.boys.forEach(function(male) {
               data.push(male);
@@ -127,47 +106,41 @@ var
             pair.girls.forEach(function(female) {
               data.push(female);
             });
-            dads = pair.boys;
-            moms = [];
-            for (y=0; y<grandPairs; y++) {
+            
+            males = pair.boys;
+            females = [];
+            
+            for (y=0; y<maxPairs; y++) {
               // if male and female not from same parents...
               if (x != y) {
-                parents[y].girls.forEach(function(female) {
+                pairs[y].girls.forEach(function(female) {
                   // add the female to the list of possible mates...
-                  moms.push(female);
+                  females.push(female);
                 });
               }
             }
             
-            parentPairs = Math.min(dads.length, moms.length);
-            
             // mate random males with random females from available pool of non-siblings:
+            parentPairs = Math.min(males.length, females.length);
             for (y=0; y<parentPairs; y++) {
               pair = [
-                utils.pick(dads),
-                utils.pick(moms)
+                utils.pick(males),
+                utils.pick(females)
               ];
-              offspring = getPeople(pair);
+              group = inst.getPeople(pair, params);
               // save data:
-              offspring.boys.forEach(function(male) {
+              group.boys.forEach(function(male) {
                 data.push(male);
               });
-              offspring.girls.forEach(function(female) {
+              group.girls.forEach(function(female) {
                 data.push(female);
               });
-              kids.push(offspring);
             }
           }
-          
-          console.log("kids", kids);
-          
+
           return data;
         },
         "displayTree": function(data) {
-          console.log('displayTree');
-          console.log(data);
-          console.log("loadingEl", loadingEl);
-          console.log("contentEl", contentEl);
           loadingEl.fadeOut("slow", function() {
             contentEl.fadeIn("slow");
           });
@@ -192,7 +165,8 @@ var
               var 
                 children = ['<ul>'];
               person.children.forEach(function(child) {
-                var title = '';
+                var 
+                  title = '';
                 if (child.parents.length) {
                   title = 'title="Parents:\n' + child.parents.map(function(parent) {return parent.name.getName();}).join("\n") + '"';
                 }
@@ -211,42 +185,7 @@ var
             };
 
           return getChildrenHtml(root);
-        },
-        "test": function() {
-          console.log("Ambra_3_node.init...");
-          console.log("modules");
-          Object.keys(modules).forEach(function(key, idx) {
-            console.log(key, modules[key]);
-          });
-          var 
-            names = modules["names"],
-            node = modules["node"],
-            dad = node.create(
-              names.create("male")
-            ),
-            mom = node.create(
-              names.create("female")
-            ),
-            firstborn = node.create(
-              names.create(),
-              [dad, mom]
-            ),
-            secondborn = node.create(
-              names.create(),
-              [dad, mom]
-            );
-          dad.addChild(firstborn);
-          mom.addChild(firstborn);
-          dad.addChild(secondborn);
-          mom.addChild(secondborn);
-          
-          console.log("dad");
-          console.log(dad);
-          
-          console.log("mom");
-          console.log(mom);
-          
         }
       };
-		return inst;
-	})();
+    return inst;
+  })();
