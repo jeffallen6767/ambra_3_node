@@ -2,6 +2,8 @@
 var
 	Ambra_3_node = (function() {
 		var 
+      loadingEl,
+      contentEl,
       modules = {},
       inst = {
         "define": function(name, ctor) {
@@ -11,14 +13,18 @@ var
           return modules[name];
         },
         "init": function() {
-          var 
-            data = inst.createNodeData({
+          loadingEl = $('#loading');
+          contentEl = $('#content');
+          inst.start();
+        },
+        "start": function() {
+          inst.displayTree(
+            inst.createNodeData({
               "levels": 3,
               "min": 4,
               "max": 8
-            });
-          
-          inst.displayTree(data);
+            })
+          );
         },
         "createNodeData": function(params) {
           var 
@@ -38,6 +44,7 @@ var
             grandDads, grandMas, grandPairs,
             dads = [], 
             moms = [],
+            parentPairs,
             sons, daughters,
             offspring,
             
@@ -131,10 +138,13 @@ var
                 });
               }
             }
-            // mate males with random females from available pool of non-siblings:
-            dads.forEach(function(dad) {
+            
+            parentPairs = Math.min(dads.length, moms.length);
+            
+            // mate random males with random females from available pool of non-siblings:
+            for (y=0; y<parentPairs; y++) {
               pair = [
-                dad,
+                utils.pick(dads),
                 utils.pick(moms)
               ];
               offspring = getPeople(pair);
@@ -146,7 +156,7 @@ var
                 data.push(female);
               });
               kids.push(offspring);
-            });
+            }
           }
           
           console.log("kids", kids);
@@ -156,6 +166,21 @@ var
         "displayTree": function(data) {
           console.log('displayTree');
           console.log(data);
+          console.log("loadingEl", loadingEl);
+          console.log("contentEl", contentEl);
+          loadingEl.fadeOut("slow", function() {
+            contentEl.fadeIn("slow");
+          });
+          contentEl.empty().append(
+            inst.getTreeHtml(data)
+          );
+        },
+        "getTreeHtml": function(data) {
+          var
+            html = [];
+          
+          
+          return html;
         },
         "test": function() {
           console.log("Ambra_3_node.init...");
@@ -195,51 +220,3 @@ var
       };
 		return inst;
 	})();
-/*
-              boys.forEach(function(boy) {
-                children.push(boy);
-              });
-              girls.forEach(function(girl) {
-                children.push(girl);
-              });
-              */
-              /*
-              next = depth + 1;
-              if (next < levels) {
-                boys.forEach(function(man) {
-                  addChildren([
-                    man, utils.choose(women)
-                  ]);
-                });
-              }
-              */
-              
-              /*
-          for (x=0; x<levels; x++) {
-            
-          }
-          data.push(
-            addChildren([], 0)
-          );
-          */
-          /*
-          for (x=0; x<levels; x++) {
-            
-              gender = y < half ? "male" : "female";
-              level.push(
-                node.create(gender)
-              );
-            }
-          }
-          */
-                    /*
-          grandDads.forEach(function(grandDad) {
-            parents = getPeople([
-              grandDad, 
-              utils.choose(grandMas)
-            ]);
-            dads = parents.boys;
-            moms = parents.girls;
-          });
-          
-          */
