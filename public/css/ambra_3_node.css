@@ -40,3 +40,43 @@ body {
   margin: 200px auto 0 auto;
   font-size: 2em;
 }
+
+/* fix bug: showing white square after last element in list... just override last-child:after */
+div#content ul li ul li:last-child:after, div#content ul li:last-child:after {
+  background: transparent;
+}
+
+/* fix positioning issue around toggle icons */
+li a {
+  padding: 2px !important;
+  top: 1.3em !important;
+}
+
+/* add vertical spacing between parent / children */
+dl, ol, ul {
+  margin-top: 20px !important;
+}
+
+.node_person {
+  letter-spacing: 0.2em;
+  background-color: #f9f9f9;
+  padding: 5px 10px !important;
+  border-radius: 5px;
+  text-shadow:
+   -1px -1px 0 #000,  
+    1px -1px 0 #000,
+    -1px 1px 0 #000,
+     1px 1px 0 #000;
+}
+
+.node_mouseover {
+  font-weight: bold;
+}
+
+.gender_male, a.gender_male:hover {
+  color: blue;
+}
+
+.gender_female, a.gender_female:hover {
+  color: pink;
+}

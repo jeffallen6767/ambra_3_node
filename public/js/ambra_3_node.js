@@ -174,13 +174,43 @@ var
           contentEl.empty().append(
             inst.getTreeHtml(data)
           );
+          inst.animateTreeHtml();
+        },
+        "animateTreeHtml": function() {
+          var
+            animator = modules["MultiNestedList"];
+          animator.create();
         },
         "getTreeHtml": function(data) {
           var
-            html = [];
-          
-          
-          return html;
+            root = {
+              "children": data.filter(function(person) {
+                return person.parents.length === 0;
+              })
+            },
+            getChildrenHtml = function getChildrenHtml(person) {
+              var 
+                children = ['<ul>'];
+              person.children.forEach(function(child) {
+                var title = '';
+                if (child.parents.length) {
+                  title = 'title="Parents:\n' + child.parents.map(function(parent) {return parent.name.getName();}).join("\n") + '"';
+                }
+                children.push(
+                  '<li><a href="#" class="node_person gender_' + child.name.gender + '"' + title + '>' + child.name.getName() + '</a>'
+                );
+                if (child.children.length) {
+                  children.push(
+                    getChildrenHtml(child)
+                  );
+                }
+                children.push('</li>');
+              });
+              children.push('</ul>');
+              return children.join("");
+            };
+
+          return getChildrenHtml(root);
         },
         "test": function() {
           console.log("Ambra_3_node.init...");
