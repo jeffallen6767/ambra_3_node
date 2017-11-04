@@ -31,7 +31,6 @@ var
             RANDOM_NAME = NO_CHILDREN = null,
             utils = modules["utils"],
             node = modules["node"],
-            
             people = {},
             boys = people.boys = [],
             girls = people.girls = [],
@@ -150,41 +149,56 @@ var
           inst.animateTreeHtml();
         },
         "animateTreeHtml": function() {
-          var
-            animator = modules["MultiNestedList"];
-          animator.create();
+          modules["MultiNestedList"].create();
         },
         "getTreeHtml": function(data) {
+          return inst.getChildrenHtml({
+            "children": data.filter(function(person) {
+              return person.parents.length === 0;
+            })
+          });
+        },
+        "getChildrenHtml": function(person) {
+          var 
+            children = ['<ul>'];
+          
+          person.children.forEach(function(child) {
+            var 
+              gender = inst.getGender(child),
+              title = inst.getTitle(child),
+              name = inst.getName(child);
+            
+            children.push(
+              '<li><a href="#" class="node_person gender_' + gender + '"' + title + '>' + name + '</a>'
+            );
+            
+            if (child.children.length) {
+              children.push(
+                inst.getChildrenHtml(child)
+              );
+            }
+            
+            children.push('</li>');
+          });
+          
+          children.push('</ul>');
+          
+          return children.join("");
+        },
+        "getTitle": function(child) {
           var
-            root = {
-              "children": data.filter(function(person) {
-                return person.parents.length === 0;
-              })
-            },
-            getChildrenHtml = function getChildrenHtml(person) {
-              var 
-                children = ['<ul>'];
-              person.children.forEach(function(child) {
-                var 
-                  title = '';
-                if (child.parents.length) {
-                  title = 'title="Parents:\n' + child.parents.map(function(parent) {return parent.name.getName();}).join("\n") + '"';
-                }
-                children.push(
-                  '<li><a href="#" class="node_person gender_' + child.name.gender + '"' + title + '>' + child.name.getName() + '</a>'
-                );
-                if (child.children.length) {
-                  children.push(
-                    getChildrenHtml(child)
-                  );
-                }
-                children.push('</li>');
-              });
-              children.push('</ul>');
-              return children.join("");
-            };
-
-          return getChildrenHtml(root);
+            p = child.parents;
+          return (
+            p.length
+              ? 'title="Parents:\n' + p.map(inst.getName).join("\n") + '"'
+              : ''
+          );
+        },
+        "getName": function(person) {
+          return person.name.getName();
+        },
+        "getGender": function(person) {
+          return person.name.gender;
         }
       };
     return inst;

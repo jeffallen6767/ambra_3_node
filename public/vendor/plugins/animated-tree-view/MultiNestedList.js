@@ -28,12 +28,12 @@ Ambra_3_node.define("MultiNestedList", function(ctx) {
       $('ul li').each(function(){
         $this = $(this);
         $this.mouseenter(function(e){
-          //$( this ).children("a").css({"font-weight":"bold","color":"#336b9b"});
+          // fix bug where mouseover color was uncontrollable
           $( this ).children("a").addClass("node_mouseover");
           e.preventDefault();
         });
         $this.mouseleave(function(e){
-          //$( this ).children("a").css({"font-weight":"normal","color":"#428bca"});
+          // fix bug where mouseover color was uncontrollable
           $( this ).children("a").removeClass("node_mouseover");
           e.preventDefault();
         });
@@ -46,10 +46,11 @@ Ambra_3_node.define("MultiNestedList", function(ctx) {
         $this.children("a").not(":last").removeClass().addClass("toogle");
       });
       // Actions to expand and contract
-      $('ul li.hasSubmenu a').click(function(){//.toogle
+      $('ul li.hasSubmenu a').click(function(){
         $this = $(this);
         $this.closest("li").children("ul").toggle("slow");
-        $this.children("i").toggle();
+        // fix bug where clicking on name didn't toggle icon
+        $this.parent().children("a").children("i").toggle();
         return false;
       });
     }
