@@ -15,7 +15,7 @@ Ambra_3_node.define("MultiNestedList", function(ctx) {
           $this.closest('ul').css("border-left", "1px solid gray");
         } else {
           // Add border in child LI, except in the last one
-          $this.closest('ul').children("li").not(":last").css("border-left","1px solid gray");
+          $this.closest('ul').children("li").not(":last").css("border-left","1px solid gray");//
           // Add the class "addBorderBefore" to create the pseudo-element :defore in the last li
           $this.closest('ul').children("li").last().children("a").addClass("addBorderBefore");
           // Add margin in the first level of the list
@@ -39,14 +39,14 @@ Ambra_3_node.define("MultiNestedList", function(ctx) {
         });
         
       });
-      // Add button to expand and condense - Using FontAwesome
+      // Add button to expand and contract - Using FontAwesome
       $('ul li.hasSubmenu').each(function(){
         $this = $(this);
         $this.prepend("<a href='#'><i class='fa fa-minus-circle'></i><i style='display:none;' class='fa fa-plus-circle'></i></a>");
         $this.children("a").not(":last").removeClass().addClass("toogle");
       });
-      // Actions to expand and consense
-      $('ul li.hasSubmenu a.toogle').click(function(){
+      // Actions to expand and contract
+      $('ul li.hasSubmenu a').click(function(){//.toogle
         $this = $(this);
         $this.closest("li").children("ul").toggle("slow");
         $this.children("i").toggle();

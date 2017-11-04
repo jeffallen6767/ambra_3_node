@@ -1,0 +1,36 @@
+
+/* BEGIN: fixes for animated-tree-view */
+
+/* fix bug: showing white square after last element in list... just override last-child:after */
+div#content ul li ul li:last-child:after, div#content ul li:last-child:after {
+  background: transparent !important;
+}
+
+/* fix vertical lines meeting horizontal lines */
+ul li, ul li ul li {
+  top: 14px !important;
+}
+
+/* fix positioning issue around toggle icons */
+li a {
+  padding: 2px !important;
+  top: 1.3em !important;
+}
+
+/* fix vertical spacing between parent / children */
+dl, ol, ul {
+  margin-top: 10px !important;
+}
+
+/* fix last:child vertical lines */
+a.addBorderBefore:before {
+    height: 32px !important;
+    left: -42px !important;
+    top:-18px !important;
+}
+
+/* tweak color of toggle symbols */
+i.fa {
+  color: #606060;
+}
+/* END: fixes for animated-tree-view */
